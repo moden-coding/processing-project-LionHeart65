@@ -1,4 +1,8 @@
+import java.util.ArrayList;
+
 import processing.core.PApplet;
+
+
 
 public class App extends PApplet {
 
@@ -13,6 +17,7 @@ public class App extends PApplet {
     int bulY = 0;
     float bulletSpeed = 5;
     boolean isShoot = false;
+    ArrayList<Enemy> Enemies = new ArrayList<>();
 
     public void setup() {
         charX = width / 2;
@@ -22,13 +27,31 @@ public class App extends PApplet {
     }
 
     public void settings() {
-        size(750, 500);
+        size(1500, 1000);
     }
-    public void enemieCreate() {
-
-    }
-    int count;
     
+    public int randX() {
+        if (random(1) > 0.5) {
+            float X = random(Float.valueOf(0), Float.valueOf(50));
+
+            return Math.round(X);
+        } else {
+            float X = random(Float.valueOf(width-50), Float.valueOf(width));
+            return Math.round(X);
+        }
+    }
+    public int randY() {
+        if (random(1) > 0.5) {
+            float Y = random(Float.valueOf(0), Float.valueOf(50));
+
+            return Math.round(Y);
+        } else {
+            float Y = random(Float.valueOf(height-50), Float.valueOf(height));
+            return Math.round(Y);
+        }
+        
+    }
+
     public void draw() {
 
         background(bg);
@@ -39,8 +62,15 @@ public class App extends PApplet {
         } else {
             shoot();
         }
-        Enemy e = new Enemy(5,5,this);
-        e.move(charX, charY);
+        if (frameCount % 180 == 0) {
+            
+            Enemies.add(new Enemy(randX(),randY(),this));
+        }
+        for (Enemy enemy : Enemies) {
+            enemy.move(charX, charY);
+            // enemy.display();
+
+        }
         
     }
 
@@ -71,7 +101,6 @@ public class App extends PApplet {
         if (bulX > width || bulX < 0 || bulY > height || bulY < 0) {
             isShoot = false;
         }
-        System.out.println(shootAngle);
         // fix down shoot flying left
 
     }
