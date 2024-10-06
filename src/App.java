@@ -198,20 +198,16 @@ public class App extends PApplet {
             score = 0;
             wave = 1;
             hearts = 3;
-            System.out.println(Enemies.size());
-            int size = Enemies.size()-1; //intresting, remopving made less enemies, equlized at three.
-            for (int i = 0; i < size; i++) {
-                System.out.println("removed" + i);
-                Enemies.remove(Enemies.get(i));
-                System.out.println(Enemies.size());
-            }
-            System.out.println(Enemies.size());
+             //intresting, remopving made less enemies, equlized at three, positions in array list changed. was a cool fix, then i discorvered .clear
+            Enemies.clear();
             iFrames = 0;
             shootFrames = 0;
             lostLife = false;
             shot = false;
             waveSpawns = 0;
             gameCode = 0;
+            charX = width / 2;
+     charY = height / 2;
         }
         fill(255);
     }
