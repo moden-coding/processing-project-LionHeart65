@@ -61,7 +61,9 @@ public class App extends PApplet {
     }
 
     int iFrames = 0;
+    int shootFrames = 0;
     boolean lostLife = false;
+    boolean shot = false;
 
     public void draw() {
 
@@ -72,35 +74,33 @@ public class App extends PApplet {
         textSize(35);
         text("Score: " + score, 15, 35);
 
-        if (!isShoot) {
-            bulX = charX + 5;
-            bulY = charY + 20;
+        bulX = charX + 5;
+        bulY = charY + 20;
 
-        } else {
-            shoot();
-        }
         if (frameCount % 180 == 0) {
             // makes new enemy every 3 seconds
-            
+
             Enemies.add(new Enemy(randX(), randY(), this));
-                
-            
+
         }
 
         for (int i = 0; i < Enemies.size(); i++) {
 
             Enemies.get(i).move(charX, charY);
+            // allows enemies to die
+            for (Bullet bullet : Bullets) {
+                if (dist(Enemies.get(i).selfX, Enemies.get(i).selfY, bullet.bulX, bullet.bulY) < 25) {
+                    Enemies.remove(Enemies.get(i));
+                    //interesting, couldn't remove wirth bullet because couldn't accses index
+                    bullet.remove();
 
-            if (isShoot && dist(Enemies.get(i).selfX, Enemies.get(i).selfY, bulX, bulY) < 25) {
-                Enemies.remove(Enemies.get(i));
-                isShoot = false;
-                // allows enemies to die
-                score += 100;
+                    score += 100;
+                }
             }
+            // allows player to lose hearts
             if (dist(Enemies.get(i).selfX, Enemies.get(i).selfY, charX, charY) < 50 && !lostLife) {
                 hearts--;
                 lostLife = true;
-                // allows player to lose hearts
             }
 
         }
@@ -108,11 +108,24 @@ public class App extends PApplet {
         if (lostLife) {
             iFrames++;
         }
+        if (shot) {
+            shootFrames++;
+        }
         if (iFrames >= 180) {
             lostLife = false;
             iFrames = 0;
         }
-
+        if (shootFrames >= 30) {
+            shot = false;
+            shootFrames = 0;
+        }
+        for (int i = 0; i < Bullets.size(); i++) {
+            Bullets.get(i).shoot();
+            if (Bullets.get(i).bulX > width || Bullets.get(i).bulX < 0 || Bullets.get(i).bulY > height || Bullets.get(i).bulY < 0 || Bullets.get(i).remove) {
+                Bullets.remove(Bullets.get(i));
+            }
+            
+        }
     }
 
     public void charAndWea() {
@@ -138,23 +151,6 @@ public class App extends PApplet {
             System.exit(0);
         }
         fill(255);
-    }
-
-    public void shoot() {
-
-        fill(0);
-        rect(bulX, bulY, 5, 5);
-        bulX += bulletSpeed * cos(shootAngle);
-        bulY += bulletSpeed * sin(shootAngle);
-        fill(255);
-        if (bulX > width || bulX < 0 || bulY > height || bulY < 0) {
-            isShoot = false;
-            // if bullet leaves the map, stop shooting.
-        }
-        for (int i = 0; i < Bullets.size(); i++) {
-            
-        }
-
     }
 
     public void keyPressed() {
@@ -192,12 +188,15 @@ public class App extends PApplet {
             }
 
         } else if (key == ' ') {
-            isShoot = true;
+            if (shot == false) {
+                Bullets.add(new Bullet(bulX, bulY, shootAngle, this));
+                shot = true;
+            }
         }
     }
 
     public void lives() {
-        //displays the amount of lives as hearts in the upper left
+        // displays the amount of lives as hearts in the upper left
         fill(191, 6, 6);
         switch (hearts) {
             case (1):
@@ -214,7 +213,6 @@ public class App extends PApplet {
                 break;
         }
         fill(255);
-
 
     }
 

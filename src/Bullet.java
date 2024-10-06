@@ -6,11 +6,13 @@ public class Bullet {
     int bulX = 0;
     int bulY = 0;
     float bulletSpeed = 5;
+    boolean remove = false;
     
-    public void Enemy(int X, int Y, PApplet c) {
+    public Bullet(int X, int Y, float shootAngle, PApplet c) {
         this.c = c;
         this.bulX = X;
         this.bulY = Y;
+        this.shootAngle = shootAngle;
     }
 
     public void shoot() {
@@ -21,8 +23,9 @@ public class Bullet {
         bulY += bulletSpeed * PApplet.sin(shootAngle);
         c.fill(255);
         if (bulX > c.width || bulX < 0 || bulY > c.height || bulY < 0) {
-
         }
-
+    }
+    public void remove() {
+        remove = true;
     }
 }
