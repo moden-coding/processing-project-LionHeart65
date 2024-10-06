@@ -22,8 +22,6 @@ public class Bullet {
         bulX += bulletSpeed * PApplet.cos(shootAngle);
         bulY += bulletSpeed * PApplet.sin(shootAngle);
         c.fill(255);
-        if (bulX > c.width || bulX < 0 || bulY > c.height || bulY < 0) {
-        }
     }
     public void remove() {
         remove = true;

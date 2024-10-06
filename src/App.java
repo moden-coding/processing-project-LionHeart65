@@ -2,8 +2,8 @@ import java.util.ArrayList;
 
 import processing.core.PApplet;
 
-// start screen and instructions.
-// TODOs: fix down shoot flying left, multiple shots, janky movement,, the bad bullet thing, high score system, game over/restart screen, diffrent waves, diff enemies, more bullets
+//random freezing
+// TODOs: fix down shoot flying left, janky movement, high score system, game over/restart screen, diffrent waves, diff enemies, game over screen
 
 public class App extends PApplet {
 
@@ -20,9 +20,11 @@ public class App extends PApplet {
     boolean isShoot = false;
     ArrayList<Enemy> Enemies = new ArrayList<>();
     ArrayList<Bullet> Bullets = new ArrayList<>();
-
+    int gameCode = 0;
     int hearts = 3;
     int score = 0;
+    int wave = 0;
+    int waveSpawns = 0; // was getting out of hand too quickly
 
     public void setup() {
         charX = width / 2;
@@ -66,6 +68,20 @@ public class App extends PApplet {
     boolean shot = false;
 
     public void draw() {
+        switch (gameCode) {
+            case 0:
+                menu();
+                break;
+            case 1:
+                instr();
+                break;
+            case 2:
+                play();
+                break;
+        }
+    }
+
+    public void play() {
 
         background(bg);
         charAndWea();
@@ -73,34 +89,39 @@ public class App extends PApplet {
         fill(0);
         textSize(35);
         text("Score: " + score, 15, 35);
+        text("Wave: " + wave, 15, 70);
 
         bulX = charX + 5;
         bulY = charY + 20;
 
-        if (frameCount % 180 == 0) {
+        if (frameCount % 180 == 0 && waveSpawns <= 5) {
             // makes new enemy every 3 seconds
-
-            Enemies.add(new Enemy(randX(), randY(), this));
+            for (int i = 0; i < wave; i++) {
+                Enemies.add(new Enemy(randX(), randY(), this));
+            }
+            waveSpawns++;
 
         }
 
         for (int i = 0; i < Enemies.size(); i++) {
 
             Enemies.get(i).move(charX, charY);
-            // allows enemies to die
-            for (Bullet bullet : Bullets) {
-                if (dist(Enemies.get(i).selfX, Enemies.get(i).selfY, bullet.bulX, bullet.bulY) < 25) {
-                    Enemies.remove(Enemies.get(i));
-                    //interesting, couldn't remove wirth bullet because couldn't accses index
-                    bullet.remove();
 
-                    score += 100;
-                }
-            }
             // allows player to lose hearts
             if (dist(Enemies.get(i).selfX, Enemies.get(i).selfY, charX, charY) < 50 && !lostLife) {
                 hearts--;
                 lostLife = true;
+            }
+            // allows enemies to die
+
+            for (Bullet bullet : Bullets) {
+                if (dist(Enemies.get(i).selfX, Enemies.get(i).selfY + 20, bullet.bulX, bullet.bulY) < 25) {
+                    Enemies.remove(Enemies.get(i));
+                    // interesting, couldn't remove wirth bullet because couldn't accses index
+                    bullet.remove();
+
+                    score += 100;
+                }
             }
 
         }
@@ -121,11 +142,38 @@ public class App extends PApplet {
         }
         for (int i = 0; i < Bullets.size(); i++) {
             Bullets.get(i).shoot();
-            if (Bullets.get(i).bulX > width || Bullets.get(i).bulX < 0 || Bullets.get(i).bulY > height || Bullets.get(i).bulY < 0 || Bullets.get(i).remove) {
+            if (Bullets.get(i).bulX > width || Bullets.get(i).bulX < 0 || Bullets.get(i).bulY > height
+                    || Bullets.get(i).bulY < 0 || Bullets.get(i).remove) {
                 Bullets.remove(Bullets.get(i));
             }
-            
         }
+        if (score == 500 * wave) {
+            wave++;
+            waveSpawns = 0;
+        }
+    }
+
+    public void menu() {
+        background(bg);
+        fill(150);
+        rect((width / 2) - 250, (height / 2) - 100, 500, 200);
+        textSize(100);
+        fill(0);
+        text("Play", (width / 2) - 100, (height / 2) + 35);
+        fill(100);
+        rect((width / 2) - 200, (height / 2) + 125, 400, 75);
+        fill(0);
+        textSize(50);
+        text("Instructions", (width / 2) - 125, (height / 2) + 175);
+        fill(255);
+    }
+
+    public void instr() {
+        background(bg);
+        textSize(75);
+        text("1. Move with WSAD", 50, 75);
+        text("2. Shoot with the Space Bar", 50, 135);
+        rect(width - 100, 20, 50, 50);
     }
 
     public void charAndWea() {
@@ -147,13 +195,29 @@ public class App extends PApplet {
         // System.exit(0);
         if (hearts <= 0) {
             // what to do when player runs out of hearts;
-            System.out.println("Game over");
-            System.exit(0);
+            score = 0;
+            wave = 1;
+            hearts = 3;
+            System.out.println(Enemies.size());
+            int size = Enemies.size()-1; //intresting, remopving made less enemies, equlized at three.
+            for (int i = 0; i < size; i++) {
+                System.out.println("removed" + i);
+                Enemies.remove(Enemies.get(i));
+                System.out.println(Enemies.size());
+            }
+            System.out.println(Enemies.size());
+            iFrames = 0;
+            shootFrames = 0;
+            lostLife = false;
+            shot = false;
+            waveSpawns = 0;
+            gameCode = 0;
         }
         fill(255);
     }
 
     public void keyPressed() {
+
         if (key == 'w') {
             // makes the char move, makes the gun shoot the right way, makes the char face
             // the right way. shoots if space is pressed
@@ -193,6 +257,22 @@ public class App extends PApplet {
                 shot = true;
             }
         }
+
+    }
+
+    public void mouseClicked() {
+        if (gameCode == 0) {
+            if (mouseX > 500 && mouseX < 1000 && mouseY > 400 && mouseY < 600) {
+                gameCode = 2;
+            } else if (mouseX > 550 && mouseX < 950 && mouseY > 625 && mouseY < 700) {
+                gameCode = 1;
+            }
+        } else if (gameCode == 1) {
+            if (mouseX > 1400 && mouseX < 1450 && mouseY > 20 && mouseY < 70) {
+                gameCode = 0;
+            }
+        }
+
     }
 
     public void lives() {
