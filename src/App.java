@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import processing.core.PApplet;
 
 // start screen and instructions.
-// TODOs: fix down shoot flying left, multiple shots, janky movement,, the bad bullet thing, high score system, game over/restart screen, diffrent waves
+// TODOs: fix down shoot flying left, multiple shots, janky movement,, the bad bullet thing, high score system, game over/restart screen, diffrent waves, diff enemies, more bullets
 
 public class App extends PApplet {
 
@@ -19,6 +19,8 @@ public class App extends PApplet {
     float bulletSpeed = 5;
     boolean isShoot = false;
     ArrayList<Enemy> Enemies = new ArrayList<>();
+    ArrayList<Bullet> Bullets = new ArrayList<>();
+
     int hearts = 3;
     int score = 0;
 
@@ -79,7 +81,10 @@ public class App extends PApplet {
         }
         if (frameCount % 180 == 0) {
             // makes new enemy every 3 seconds
+            
             Enemies.add(new Enemy(randX(), randY(), this));
+                
+            
         }
 
         for (int i = 0; i < Enemies.size(); i++) {
@@ -145,6 +150,9 @@ public class App extends PApplet {
         if (bulX > width || bulX < 0 || bulY > height || bulY < 0) {
             isShoot = false;
             // if bullet leaves the map, stop shooting.
+        }
+        for (int i = 0; i < Bullets.size(); i++) {
+            
         }
 
     }
