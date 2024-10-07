@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import processing.core.PApplet;
 
 //random freezing
-// TODOs: fix down shoot flying left, janky movement, high score system, game over/restart screen, diffrent waves, diff enemies, game over screen
+// TODOs: high score system, game over/restart screen, diffrent waves, diff enemies,
 
 public class App extends PApplet {
 
@@ -11,7 +11,7 @@ public class App extends PApplet {
     int charY = 0;
     int lr = 1;
     int ud = 1;
-    float speed = 10;
+    float speed = 5;
     int bg = color(59, 47, 30);
     float shootAngle = 0;
     int bulX = 0;
@@ -25,7 +25,13 @@ public class App extends PApplet {
     int score = 0;
     int wave = 0;
     int waveSpawns = 0; // was getting out of hand too quickly
-
+    boolean moveXPos = false;
+    boolean moveXNeg = false;
+    boolean moveYPos = false;
+    boolean moveYNeg = false;
+    int highScore = 0;
+    int shootSpeed = 30;
+    int money = 0;
     public void setup() {
         charX = width / 2;
         charY = height / 2;
@@ -78,6 +84,8 @@ public class App extends PApplet {
             case 2:
                 play();
                 break;
+            case 3:
+                shop();
         }
     }
 
@@ -94,6 +102,24 @@ public class App extends PApplet {
         bulX = charX + 5;
         bulY = charY + 20;
 
+        if (moveXPos) {// D
+            charX += speed;
+        }
+        if (moveXNeg) {// A
+            charX -= speed;
+        }
+        if (moveYPos) { // S
+            charY += speed;
+        }
+        if (moveYNeg) { // W
+            charY -= speed;
+        }
+        if (moveXNeg && moveYNeg || moveXNeg && moveYPos || moveXPos && moveYNeg || moveXPos && moveYPos
+                || moveYNeg && moveXNeg || moveYNeg && moveXPos || moveYPos && moveXNeg || moveYPos && moveXPos) {
+            speed = sqrt(8);
+        } else {
+            speed = 4;
+        }
         if (frameCount % 180 == 0 && waveSpawns <= 5) {
             // makes new enemy every 3 seconds
             for (int i = 0; i < wave; i++) {
@@ -119,7 +145,7 @@ public class App extends PApplet {
                     Enemies.remove(Enemies.get(i));
                     // interesting, couldn't remove wirth bullet because couldn't accses index
                     bullet.remove();
-
+                    money += 10;
                     score += 100;
                 }
             }
@@ -136,7 +162,7 @@ public class App extends PApplet {
             lostLife = false;
             iFrames = 0;
         }
-        if (shootFrames >= 30) {
+        if (shootFrames >= shootSpeed) {
             shot = false;
             shootFrames = 0;
         }
@@ -155,6 +181,7 @@ public class App extends PApplet {
 
     public void menu() {
         background(bg);
+        ellipse(width - 60, 45, 50, 50);
         fill(150);
         rect((width / 2) - 250, (height / 2) - 100, 500, 200);
         textSize(100);
@@ -164,8 +191,15 @@ public class App extends PApplet {
         rect((width / 2) - 200, (height / 2) + 125, 400, 75);
         fill(0);
         textSize(50);
-        text("Instructions", (width / 2) - 125, (height / 2) + 175);
+        text("Shop", (width / 2) - 60, (height / 2) + 175);
+        textSize(35);
+        text("High Score: " + highScore, 15, 35);
+        text("Money: " + money, 15, 70);
+        textSize(50);
+        text("i", width - 67, 63);
         fill(255);
+        
+        
     }
 
     public void instr() {
@@ -173,9 +207,22 @@ public class App extends PApplet {
         textSize(75);
         text("1. Move with WSAD", 50, 75);
         text("2. Shoot with the Space Bar", 50, 135);
-        rect(width - 100, 20, 50, 50);
+        rect(width - 90, 20, 50, 50);
+        fill(0);
+        textSize(50);
+        text("H", width - 80, 63);
+        fill(255);
+
     }
 
+    public void shop() {
+        background(bg);
+        rect(width - 90, 20, 50, 50);
+        fill(0);
+        text("H", width - 80, 63);
+        fill(255);
+    }
+    
     public void charAndWea() {
         fill(145, 125, 80);
         rect(charX, charY, 20, 50);
@@ -195,10 +242,14 @@ public class App extends PApplet {
         // System.exit(0);
         if (hearts <= 0) {
             // what to do when player runs out of hearts;
+            if (score > highScore) {
+                highScore = score;
+            }
             score = 0;
             wave = 1;
             hearts = 3;
-             //intresting, remopving made less enemies, equlized at three, positions in array list changed. was a cool fix, then i discorvered .clear
+            // intresting, remopving made less enemies, equlized at three, positions in
+            // array list changed. was a cool fix, then i discorvered .clear
             Enemies.clear();
             iFrames = 0;
             shootFrames = 0;
@@ -207,7 +258,7 @@ public class App extends PApplet {
             waveSpawns = 0;
             gameCode = 0;
             charX = width / 2;
-     charY = height / 2;
+            charY = height / 2;
         }
         fill(255);
     }
@@ -217,13 +268,14 @@ public class App extends PApplet {
         if (key == 'w') {
             // makes the char move, makes the gun shoot the right way, makes the char face
             // the right way. shoots if space is pressed
-            charY -= speed;
+            moveYNeg = true;
             ud = 1;
             if (!isShoot) {
                 shootAngle = (float) 4.71239;
             }
         } else if (key == 's') {
-            charY += speed;
+
+            moveYPos = true;
             ud = -1;
             if (!isShoot)
 
@@ -231,7 +283,7 @@ public class App extends PApplet {
                 shootAngle = (float) 1.5708;
             }
         } else if (key == 'a') {
-            charX -= speed;
+            moveXNeg = true;
             lr = -1;
             ud = 0;
             if (!isShoot)
@@ -240,7 +292,7 @@ public class App extends PApplet {
                 shootAngle = (float) 3.14159;
             }
         } else if (key == 'd') {
-            charX += speed;
+            moveXPos = true;
             lr = 1;
             ud = 0;
             if (!isShoot) {
@@ -256,14 +308,37 @@ public class App extends PApplet {
 
     }
 
+    public void keyReleased() {
+        if (key == 'w') {
+
+            moveYNeg = false;
+
+        } else if (key == 's') {
+
+            moveYPos = false;
+
+        } else if (key == 'a') {
+            moveXNeg = false;
+
+        } else if (key == 'd') {
+            moveXPos = false;
+        }
+    }
+
     public void mouseClicked() {
         if (gameCode == 0) {
             if (mouseX > 500 && mouseX < 1000 && mouseY > 400 && mouseY < 600) {
                 gameCode = 2;
             } else if (mouseX > 550 && mouseX < 950 && mouseY > 625 && mouseY < 700) {
+                gameCode = 3;
+            } else if (dist(mouseX, mouseY, width - 67, 63) < 51) {
                 gameCode = 1;
             }
         } else if (gameCode == 1) {
+            if (mouseX > 1400 && mouseX < 1450 && mouseY > 20 && mouseY < 70) {
+                gameCode = 0;
+            }
+        } else if (gameCode == 3) {
             if (mouseX > 1400 && mouseX < 1450 && mouseY > 20 && mouseY < 70) {
                 gameCode = 0;
             }
