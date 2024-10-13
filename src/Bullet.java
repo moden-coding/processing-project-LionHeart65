@@ -1,12 +1,12 @@
 import processing.core.PApplet;
 
 public class Bullet {
-    PApplet c;
-    float shootAngle = 0;
+    private PApplet c;
+    private float shootAngle = 0;
     int bulX = 0;
-    int bulY = 0;
-    float bulletSpeed = 5;
-    boolean remove = false;
+    private int bulY = 0;
+    private float bulletSpeed = 5;
+    private boolean remove = false;
     
     public Bullet(int X, int Y, float shootAngle, PApplet c) {
         this.c = c;
@@ -15,6 +15,18 @@ public class Bullet {
         this.shootAngle = shootAngle;
     }
 
+    public int getPos(char axis) {
+        if (axis == 'X') {
+            return Math.round(bulX);
+        } else if (axis == 'Y') {
+            return Math.round(bulY);
+        } else {
+            return 0;
+        }
+    }
+    public boolean getRemove() {
+        return remove;
+    }
     public void shoot() {
 
         c.fill(0);

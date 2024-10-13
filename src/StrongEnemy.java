@@ -2,7 +2,7 @@ import processing.core.PApplet;
 
 public class StrongEnemy extends Enemy {
 
-    public int health = values(0);
+    private int health = values(0);
     private int[] colors = {values(1), values(2), values(3)};
 
     public StrongEnemy(int X, int Y, PApplet c) {

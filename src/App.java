@@ -147,7 +147,7 @@ public class App extends PApplet {
             Enemies.get(i).move(charX, charY);
 
             // allows player to lose hearts
-            if (dist(Enemies.get(i).selfX, Enemies.get(i).selfY, charX, charY) < 50 && !lostLife) {
+            if (dist(Enemies.get(i).getPos('X'), Enemies.get(i).getPos('Y'), charX, charY) < 50 && !lostLife) {
                 lives--;
                 lostLife = true;
             }
@@ -155,9 +155,9 @@ public class App extends PApplet {
 
             for (Bullet bullet : Bullets) {
                 //
-                if (dist(Enemies.get(i).selfX, Enemies.get(i).selfY + 20, bullet.bulX, bullet.bulY) < 25) {
+                if (dist(Enemies.get(i).getPos('X'), Enemies.get(i).getPos('Y') + 20, bullet.getPos('X'), bullet.getPos('Y')) < 25) {
                     Enemies.get(i).hit();
-                    if (Enemies.get(i).health == 0) {
+                    if (Enemies.get(i).getHealth() == 0) {
                         Enemies.remove(Enemies.get(i));
                     }
                     // interesting, couldn't remove wirth bullet because couldn't accses index
@@ -185,8 +185,8 @@ public class App extends PApplet {
         }
         for (int i = 0; i < Bullets.size(); i++) {
             Bullets.get(i).shoot();
-            if (Bullets.get(i).bulX > width || Bullets.get(i).bulX < 0 || Bullets.get(i).bulY > height
-                    || Bullets.get(i).bulY < 0 || Bullets.get(i).remove) {
+            if (Bullets.get(i).getPos('X') > width || Bullets.get(i).getPos('X') < 0 || Bullets.get(i).getPos('Y') > height
+                    || Bullets.get(i).getPos('Y') < 0 || Bullets.get(i).getRemove()) {
                 Bullets.remove(Bullets.get(i));
             }
         }

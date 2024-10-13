@@ -3,13 +3,13 @@ import processing.core.PApplet;
 import processing.core.PVector;
 
 public class Enemy {
-    PVector position = new PVector(0, 0); // current pos.
-    PVector charXY; // charpos
-    PApplet c; //discriptive enough?
+    private PVector position = new PVector(0, 0); // current pos.
+    private PVector charXY; // charpos
+    private PApplet c; //discriptive enough?
     private float speed = 1.5f;
-    public float selfX = 0; //need to ask if this is ok, its probaly not though. Feels simiplier than a function though
-    public float selfY = 0;
-    public int health = values(0);
+    private float selfX = 0; //need to ask if this is ok, its probaly not though. Feels simiplier than a function though
+    private float selfY = 0;
+    private int health = values(0);
     private int[] colors = {values(1), values(2), values(3)};
     
     public Enemy(int X, int Y, PApplet c) {
@@ -39,6 +39,9 @@ public class Enemy {
         }
     }
 
+    public int getHealth() {
+        return health;
+    }
     public void move(int charX, int charY) {
 
         position = new PVector(selfX, selfY);
@@ -59,6 +62,15 @@ public class Enemy {
 
     public void hit() {
         health--;
+    }
+    public int getPos(char axis) {
+        if (axis == 'X') {
+            return Math.round(selfX);
+        } else if (axis == 'Y') {
+            return Math.round(selfY);
+        } else {
+            return 0;
+        }
     }
 
 }
