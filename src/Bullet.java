@@ -1,20 +1,21 @@
 import processing.core.PApplet;
 
 public class Bullet {
-    private PApplet c;
-    private float shootAngle = 0;
+    private PApplet c; // main canvas
+    private float shootAngle = 0; // angle the bullet should be shot at
     private int bulX = 0;
     private int bulY = 0;
     private float bulletSpeed = 5;
-    private boolean remove = false;
-    
+    private boolean remove = false; // should the bullet get removed this frame?
+
     public Bullet(int X, int Y, float shootAngle, PApplet c) {
         this.c = c;
         this.bulX = X;
         this.bulY = Y;
         this.shootAngle = shootAngle;
     }
-
+    
+    // gets pos of bullet to deal with in the App file.
     public int getPos(char axis) {
         if (axis == 'X') {
             return Math.round(bulX);
@@ -24,9 +25,12 @@ public class Bullet {
             return 0;
         }
     }
+
     public boolean getRemove() {
         return remove;
     }
+
+    // moves the bullet by bullet speed at the shootAngle
     public void shoot() {
 
         c.fill(0);
@@ -35,6 +39,7 @@ public class Bullet {
         bulY += bulletSpeed * PApplet.sin(shootAngle);
         c.fill(255);
     }
+
     public void remove() {
         remove = true;
     }

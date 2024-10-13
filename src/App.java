@@ -10,37 +10,37 @@ public class App extends PApplet {
 
     int charX = 0;
     int charY = 0;
-    int lr = 1;
-    int ud = 1;
-    float speed = 1;
-    float speedStat = 3;
-    int bg = color(59, 47, 30);
-    float shootAngle = 0;
-    int bulX = 0;
+    int lr = 1; // is char facing left or right, 1 is right, -1 is left
+    int ud = 1; // is char facing up or down, 1 is up, -1 is down
+    float speed = 1; //speed of the player, adjusted to move diagonally
+    float speedStat = 3; // raw speed of the player
+    int bg = color(59, 47, 30); // background color
+    float shootAngle = 0; // angle to shoot at
+    int bulX = 0; // coords to make new bullets at
     int bulY = 0;
     float bulletSpeed = 5;
-    boolean isShoot = false;
-    ArrayList<Enemy> Enemies = new ArrayList<>();
-    ArrayList<Bullet> Bullets = new ArrayList<>();
-    int gameCode = 3;
-    int hearts = 3;
-    int lives = 3;
+    boolean isShoot = false; // is the gun shooting, if true can't shoot
+    ArrayList<Enemy> Enemies = new ArrayList<>(); // list of all enemies
+    ArrayList<Bullet> Bullets = new ArrayList<>(); // list of all bullets
+    int gameCode = 0; // what scene is the game on, 0 is menu, 1 is instructions, 2 is game, 3 is shop
+    int hearts = 3; // how many lives the player starts with
+    int lives = 3; // how many lives the player currently has
     int score = 0;
     int wave = 1;
-    int waveSpawns = 0; // was getting out of hand too quickly
-    boolean moveXPos = false;
+    int waveSpawns = 0; // how many enemies were spawned this wave
+    boolean moveXPos = false; // is the player moving in these directions
     boolean moveXNeg = false;
     boolean moveYPos = false;
     boolean moveYNeg = false;
     int highScore = 0;
-    int shootSpeed = 30;
+    int shootSpeed = 30; // how many frames between shots
     int money = 0;
     int damage = 1;
-    int shopCode = 1;
-    PImage wipBgImg;
+    int shopCode = 1; // what part of the shop to show
+    PImage wipBgImg; // background image for the unfinished shop.
 
     public void setup() {
-        charX = width / 2;
+        charX = width / 2; // sets player starting coords.
         charY = height / 2;
         background(bg);
         wipBgImg = loadImage("wipBg.jpg");
@@ -76,9 +76,9 @@ public class App extends PApplet {
 
     }
 
-    int iFrames = 0;
-    int shootFrames = 0;
-    boolean lostLife = false;
+    int iFrames = 0; // frames since player lost a life.
+    int shootFrames = 0; // frames since the player shot
+    boolean lostLife = false; // has the play
     boolean shot = false;
 
     public void draw() {
@@ -358,34 +358,30 @@ public class App extends PApplet {
             // the right way. shoots if space is pressed
             moveYNeg = true;
             ud = 1;
-            if (!isShoot) {
+            
                 shootAngle = (float) 4.71239;
-            }
+            
         } else if (key == 's') {
 
             moveYPos = true;
             ud = -1;
-            if (!isShoot)
-
-            {
+            
                 shootAngle = (float) 1.5708;
-            }
+            
         } else if (key == 'a') {
             moveXNeg = true;
             lr = -1;
             ud = 0;
-            if (!isShoot)
-
-            {
+            
                 shootAngle = (float) 3.14159;
-            }
+            
         } else if (key == 'd') {
             moveXPos = true;
             lr = 1;
             ud = 0;
-            if (!isShoot) {
+           
                 shootAngle = 0;
-            }
+            
 
         } else if (key == ' ') {
             if (shot == false) {
