@@ -1,4 +1,5 @@
 import processing.core.PApplet;
+@SuppressWarnings("unused") // gets rid of incorrect warnings
 
 public class StrongEnemy extends Enemy {
 
