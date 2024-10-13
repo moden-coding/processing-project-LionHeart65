@@ -1,9 +1,10 @@
 import java.util.ArrayList;
 
 import processing.core.PApplet;
+import processing.core.PImage;
 
 //random freezing
-// TODOs: high score system, game over/restart screen, diffrent waves, diff enemies,
+// TODOs: high score system, game over/restart screen, diffrent waves, diff enemies, mrmr. moden black hole thing
 
 public class App extends PApplet {
 
@@ -11,7 +12,8 @@ public class App extends PApplet {
     int charY = 0;
     int lr = 1;
     int ud = 1;
-    float speed = 5;
+    float speed = 1;
+    float speedStat = 3;
     int bg = color(59, 47, 30);
     float shootAngle = 0;
     int bulX = 0;
@@ -20,10 +22,11 @@ public class App extends PApplet {
     boolean isShoot = false;
     ArrayList<Enemy> Enemies = new ArrayList<>();
     ArrayList<Bullet> Bullets = new ArrayList<>();
-    int gameCode = 0;
+    int gameCode = 3;
     int hearts = 3;
+    int lives = 3;
     int score = 0;
-    int wave = 0;
+    int wave = 1;
     int waveSpawns = 0; // was getting out of hand too quickly
     boolean moveXPos = false;
     boolean moveXNeg = false;
@@ -32,10 +35,15 @@ public class App extends PApplet {
     int highScore = 0;
     int shootSpeed = 30;
     int money = 0;
+    int damage = 1;
+    int shopCode = 1;
+    PImage wipBgImg;
+
     public void setup() {
         charX = width / 2;
         charY = height / 2;
         background(bg);
+        wipBgImg = loadImage("wipBg.jpg");
 
     }
 
@@ -86,6 +94,7 @@ public class App extends PApplet {
                 break;
             case 3:
                 shop();
+                break;
         }
     }
 
@@ -116,14 +125,18 @@ public class App extends PApplet {
         }
         if (moveXNeg && moveYNeg || moveXNeg && moveYPos || moveXPos && moveYNeg || moveXPos && moveYPos
                 || moveYNeg && moveXNeg || moveYNeg && moveXPos || moveYPos && moveXNeg || moveYPos && moveXPos) {
-            speed = sqrt(8);
+            speed = speedStat / sqrt(2);
         } else {
-            speed = 4;
+            speed = speedStat;
         }
         if (frameCount % 180 == 0 && waveSpawns <= 5) {
             // makes new enemy every 3 seconds
             for (int i = 0; i < wave; i++) {
-                Enemies.add(new Enemy(randX(), randY(), this));
+                if (random(1, 10) > 8) {
+                    Enemies.add(new StrongEnemy(randX(), randY(), this));
+                } else {
+                    Enemies.add(new Enemy(randX(), randY(), this));
+                }
             }
             waveSpawns++;
 
@@ -135,14 +148,18 @@ public class App extends PApplet {
 
             // allows player to lose hearts
             if (dist(Enemies.get(i).selfX, Enemies.get(i).selfY, charX, charY) < 50 && !lostLife) {
-                hearts--;
+                lives--;
                 lostLife = true;
             }
             // allows enemies to die
 
             for (Bullet bullet : Bullets) {
+                //
                 if (dist(Enemies.get(i).selfX, Enemies.get(i).selfY + 20, bullet.bulX, bullet.bulY) < 25) {
-                    Enemies.remove(Enemies.get(i));
+                    Enemies.get(i).hit();
+                    if (Enemies.get(i).health == 0) {
+                        Enemies.remove(Enemies.get(i));
+                    }
                     // interesting, couldn't remove wirth bullet because couldn't accses index
                     bullet.remove();
                     money += 10;
@@ -173,10 +190,11 @@ public class App extends PApplet {
                 Bullets.remove(Bullets.get(i));
             }
         }
-        if (score == 500 * wave) {
+        if ((score) == waveScore(wave)) {
             wave++;
             waveSpawns = 0;
         }
+        // FIX
     }
 
     public void menu() {
@@ -198,8 +216,7 @@ public class App extends PApplet {
         textSize(50);
         text("i", width - 67, 63);
         fill(255);
-        
-        
+
     }
 
     public void instr() {
@@ -216,13 +233,82 @@ public class App extends PApplet {
     }
 
     public void shop() {
+        // guns, stats, equipment, ammo? power ups???
         background(bg);
         rect(width - 90, 20, 50, 50);
         fill(0);
         text("H", width - 80, 63);
+        textSize(35);
+        text("Money: " + money, 15, 35);
+        textSize(50);
+        fill(100);
+        rect(100, 100, 1300, 800);
+        fill(150);
+        strokeWeight(5);
+        rect(100, 100, 433, 100);
+        rect(533, 100, 433, 100);
+        rect(966, 100, 433, 100);
+        fill(0);
+        text("Weapons", 225, 170);
+        text("Stats", 680, 170);
+        text("Equipment", 1050, 170);
+        strokeWeight(1);
         fill(255);
+        switch (shopCode) {
+            case 0:
+                wipBg();
+                break;
+
+            case 1:
+                fill(75);
+                rect(150, 225, 1200, 100);
+                rect(150, 335, 1200, 100);
+                rect(150, 445, 1200, 100);
+                rect(150, 555, 1200, 100);
+
+                upgradeBar(Float.valueOf(hearts - 3), 450, 240, 15, color(191, 6, 6));
+                upgradeBar(speedStat - 1, 450, 350, 7, color(255));
+                fill(0);
+                text("More hearts", 160, 290);
+                if (hearts < 18) {
+                    text((hearts * 200) - 400 + "$", 1225, 290);
+                } else {
+                    text("Max", 1255, 290);
+                }
+
+                text("More speed", 160, 400);
+                if (speedStat <= 8) {
+                    text(Math.round(((speedStat * 10) * 50)) + "$", 1225, 400);
+                } else {
+                    text("Max", 1225, 400);
+                }
+                text("More hearts", 160, 510);
+                text(hearts * 200 + "$", 1225, 510);
+                text("More hearts", 160, 620);
+                text(hearts * 200 + "$", 1225, 620);
+
+                fill(255);
+
+                break;
+            case 2:
+                wipBg();
+                break;
+        }
+        fill(255);
+
     }
-    
+
+    public void wipBg() {
+        image(wipBgImg, 100, 200, 1300, 700);
+        fill(150);
+        rect(450, 400, 700, 200);
+        fill(0);
+        textSize(100);
+        text("Coming Soon TM", 450, 550);
+        fill(255);
+        textSize(50);
+    }
+
     public void charAndWea() {
         fill(145, 125, 80);
         rect(charX, charY, 20, 50);
@@ -240,14 +326,13 @@ public class App extends PApplet {
         } else
             System.out.println("Cry");
         // System.exit(0);
-        if (hearts <= 0) {
+        if (lives <= 0) {
             // what to do when player runs out of hearts;
             if (score > highScore) {
                 highScore = score;
             }
             score = 0;
             wave = 1;
-            hearts = 3;
             // intresting, remopving made less enemies, equlized at three, positions in
             // array list changed. was a cool fix, then i discorvered .clear
             Enemies.clear();
@@ -259,12 +344,15 @@ public class App extends PApplet {
             gameCode = 0;
             charX = width / 2;
             charY = height / 2;
+            lives = hearts;
         }
         fill(255);
     }
 
     public void keyPressed() {
-
+        if (key == '~') {
+            lives = 0;
+        }
         if (key == 'w') {
             // makes the char move, makes the gun shoot the right way, makes the char face
             // the right way. shoots if space is pressed
@@ -305,6 +393,10 @@ public class App extends PApplet {
                 shot = true;
             }
         }
+        // REMOVE
+        if (key == '/') {
+            money += 10000;
+        }
 
     }
 
@@ -341,7 +433,29 @@ public class App extends PApplet {
         } else if (gameCode == 3) {
             if (mouseX > 1400 && mouseX < 1450 && mouseY > 20 && mouseY < 70) {
                 gameCode = 0;
+            } else if (mouseX > 100 && mouseX < 533 && mouseY > 100 && mouseY < 200) {
+                shopCode = 0;
+            } else if (mouseX > 533 && mouseX < 966 && mouseY > 100 && mouseY < 200) {
+                shopCode = 1;
+            } else if (mouseX > 966 && mouseX < 1300 && mouseY > 100 && mouseY < 200) {
+                shopCode = 2;
             }
+            if (shopCode == 1) {
+                if (mouseX > 150 && mouseX < 436 && mouseY > 225 && mouseY < 322) {
+                    if (money >= (hearts * 200) - 400 && hearts <= 17) {
+                        money -= (hearts * 200) - 400;
+                        hearts += 1;
+                        lives = hearts;
+                    }
+                } else if (mouseX > 150 && mouseX < 436 && mouseY > 335 && mouseY < 432) {
+                    if (money >= Math.round((speedStat * 10) * 50) && speed <= 8) {
+                        money -= Math.round((speedStat * 10) * 50);
+                        speedStat += 0.1;
+                        speed = speedStat;
+                    }
+                }
+            }
+
         }
 
     }
@@ -349,7 +463,7 @@ public class App extends PApplet {
     public void lives() {
         // displays the amount of lives as hearts in the upper left
         fill(191, 6, 6);
-        switch (hearts) {
+        switch (lives) {
             case (1):
                 rect(width - 100, 35, 25, 25);
                 break;
@@ -362,9 +476,29 @@ public class App extends PApplet {
                 rect(width - 66, 35, 25, 25);
                 rect(width - 33, 35, 25, 25);
                 break;
+            default:
+                text(lives + "X ", width - 100, 55);
+                rect(width - 33, 35, 25, 25);
+                break;
         }
         fill(255);
 
+    }
+
+    public int waveScore(int wave) {
+        int score = 0;
+        for (int i = 1; i <= wave; i++) {
+            score += 500 * i;
+        }
+        return score;
+    }
+    public void upgradeBar(float stat, int X, int Y, int max, int color) {
+        fill(150);
+        rect(X, Y, 490, 70);
+        fill(color);
+        rect(X, Y, (500 / max) * stat, 70);
+        System.out.println(String.format("Max: %f, Stat: %f,", Float.valueOf(max), stat));
+        fill(255);
     }
 
     public static void main(String[] args) {

@@ -9,14 +9,35 @@ public class Enemy {
     private float speed = 1.5f;
     public float selfX = 0; //need to ask if this is ok, its probaly not though. Feels simiplier than a function though
     public float selfY = 0;
-
+    public int health = values(0);
+    private int[] colors = {values(1), values(2), values(3)};
+    
     public Enemy(int X, int Y, PApplet c) {
         this.c = c;
         this.selfX = X;
         this.selfY = Y;
+        
     }
-
     
+
+    public int values(int value) {
+        switch (value) {
+            case 0:
+                return 1;
+
+            case 1:
+                return 27;
+            case 2:
+                return 102;
+            case 3:
+                return 4;
+
+
+            default:
+                return 0;
+    
+        }
+    }
 
     public void move(int charX, int charY) {
 
@@ -31,10 +52,13 @@ public class Enemy {
         position.add(direction);
         selfX = position.x;
         selfY = position.y;
-        c.fill(27, 102, 4);
+        c.fill(colors[0],colors[1],colors[2]);
         c.rect(selfX, selfY, 10, 40);
         c.fill(255);
     }
 
+    public void hit() {
+        health--;
+    }
 
 }
