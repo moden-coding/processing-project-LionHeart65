@@ -3,7 +3,7 @@ import processing.core.PApplet;
 public class Bullet {
     private PApplet c;
     private float shootAngle = 0;
-    int bulX = 0;
+    private int bulX = 0;
     private int bulY = 0;
     private float bulletSpeed = 5;
     private boolean remove = false;
