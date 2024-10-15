@@ -13,16 +13,16 @@ public class App extends PApplet {
     int ud = 1; // is char facing up or down, 1 is up, -1 is down
     float speed = 1; // speed of the player, adjusted to move diagonally
     float speedStat = 3; // raw speed of the player
-    int bg = color(59, 47, 30); // background color
-    float shootAngle = 0; // angle to shoot at
+    int bg = color(59, 47, 30);
+    float shootAngle = 0;
     int bulX = 0; // coords to make new bullets at
     int bulY = 0;
     float bulletSpeed = 5;
-    ArrayList<Enemy> Enemies = new ArrayList<>(); // list of all enemies
-    ArrayList<Bullet> Bullets = new ArrayList<>(); // list of all bullets
+    ArrayList<Enemy> Enemies = new ArrayList<>();
+    ArrayList<Bullet> Bullets = new ArrayList<>();
     int gameCode = 0; // what scene is the game on, 0 is menu, 1 is instructions, 2 is game, 3 is shop
-    int hearts = 3; // how many lives the player starts with
-    int lives = 3; // how many lives the player currently has
+    int startingLives = 3;
+    int lives = 3;
     int score = 0;
     int wave = 1;
     int waveSpawns = 0; // how many enemies were spawned this wave
@@ -36,6 +36,10 @@ public class App extends PApplet {
     int damage = 1;
     int shopCode = 1; // what part of the shop to show
     PImage wipBgImg; // background image for the unfinished shop.
+    int iFrames = 0; // frames since player lost a life.
+    int shootFrames = 0; // frames since the player shot
+    boolean lostLife = false; // has the player lost a life within 3 secs
+    boolean shot = false; // is the gun on cool down
 
     public void setup() {
         charX = width / 2; // sets player starting coords.
@@ -45,7 +49,7 @@ public class App extends PApplet {
 
     }
 
-    public void settings() {
+    public void settings() { //Sets the background size
         size(1500, 1000);
     }
 
@@ -74,11 +78,6 @@ public class App extends PApplet {
 
     }
 
-    int iFrames = 0; // frames since player lost a life.
-    int shootFrames = 0; // frames since the player shot
-    boolean lostLife = false; // has the player lost a life within 3 secs
-    boolean shot = false; // is the gun on cooldown
-
     public void draw() {
         // decides which scene to show based on game code value.
         switch (gameCode) {
@@ -86,7 +85,7 @@ public class App extends PApplet {
                 menu();
                 break;
             case 1:
-                instr();
+                instructions();
                 break;
             case 2:
                 play();
@@ -241,7 +240,7 @@ public class App extends PApplet {
 
     }
 
-    public void instr() {
+    public void instructions() { 
         background(bg);
         textSize(75);
         text("1. Move with WSAD", 50, 75);
@@ -290,13 +289,13 @@ public class App extends PApplet {
                 rect(150, 555, 1200, 100);
 
                 // shows a bar for how many upgrades have been purchased
-                upgradeBar(Float.valueOf(hearts - 3), 450, 240, 15, color(191, 6, 6));
+                upgradeBar(Float.valueOf(startingLives - 3), 450, 240, 15, color(191, 6, 6));
                 upgradeBar(speedStat - 1, 450, 350, 7, color(255));
                 fill(0);
                 text("More hearts", 160, 290);
                 // shows current price of a new heart, or if it is maxed out
-                if (hearts < 18) {
-                    text((hearts * 200) - 400 + "$", 1225, 290);
+                if (startingLives < 18) {
+                    text((startingLives * 200) - 400 + "$", 1225, 290);
                 } else {
                     text("Max", 1255, 290);
                 }
@@ -310,9 +309,9 @@ public class App extends PApplet {
                     text("Max", 1225, 400);
                 }
                 text("More hearts", 160, 510);
-                text(hearts * 200 + "$", 1225, 510);
+                text(startingLives * 200 + "$", 1225, 510);
                 text("More hearts", 160, 620);
-                text(hearts * 200 + "$", 1225, 620);
+                text(startingLives * 200 + "$", 1225, 620);
 
                 fill(255);
 
@@ -336,7 +335,7 @@ public class App extends PApplet {
         textSize(50);
     }
 
-    // creates the char and the gun on the screen
+    // creates the character and the gun on the screen
     public void charAndWea() {
         fill(145, 125, 80);
         rect(charX, charY, 20, 50);
@@ -370,7 +369,7 @@ public class App extends PApplet {
             gameCode = 0;
             charX = width / 2;
             charY = height / 2;
-            lives = hearts;
+            lives = startingLives;
         }
         fill(255);
     }
@@ -466,10 +465,10 @@ public class App extends PApplet {
             if (shopCode == 1) {
                 // buys more hearts
                 if (mouseX > 150 && mouseX < 436 && mouseY > 225 && mouseY < 322) {
-                    if (money >= (hearts * 200) - 400 && hearts <= 17) {
-                        money -= (hearts * 200) - 400;
-                        hearts += 1;
-                        lives = hearts;
+                    if (money >= (startingLives * 200) - 400 && startingLives <= 17) {
+                        money -= (startingLives * 200) - 400;
+                        startingLives += 1;
+                        lives = startingLives;
                     }
                     // buys more speed
                 } else if (mouseX > 150 && mouseX < 436 && mouseY > 335 && mouseY < 432) {
@@ -526,7 +525,6 @@ public class App extends PApplet {
         rect(X, Y, 490, 70);
         fill(color);
         rect(X, Y, (500 / max) * stat, 70);
-        System.out.println(String.format("Max: %f, Stat: %f,", Float.valueOf(max), stat));
         fill(255);
     }
 
